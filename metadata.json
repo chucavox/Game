@@ -1,0 +1,7 @@
+{
+  "name": "Mini Golf Master & AI Caddy",
+  "description": "A physics-based mini golf game featuring 3 progressive levels and a conversational AI Caddy powered by Gemini Live API.",
+  "requestFramePermissions": [
+    "microphone"
+  ]
+}

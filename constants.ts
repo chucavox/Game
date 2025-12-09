@@ -2,7 +2,7 @@ import { LevelData } from './types';
 
 // Physics Constants
 export const FRICTION_GRASS = 0.975;
-export const FRICTION_SAND = 0.92;
+export const FRICTION_SAND = 0.88; // Increased drag (was 0.92)
 export const WALL_BOUNCE = 0.7;
 export const STOP_VELOCITY = 0.08;
 export const MAX_POWER = 15;

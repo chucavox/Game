@@ -151,9 +151,18 @@ const GameCanvas: React.FC<GameCanvasProps> = ({
         }
       }
 
-      // Play sand entry sound
-      if (inSand && !wasInSandRef.current) {
-          audioManager.playSandEnter();
+      // Play sand entry sound and effects
+      if (inSand) {
+          if (!wasInSandRef.current) {
+              audioManager.playSandEnter();
+              // Create a splash of sand particles on entry
+              createParticles(ball.pos.x, ball.pos.y, 8, '#eab308');
+          }
+          
+          // While moving in sand with some speed, create drag particles
+          if (Math.random() < 0.2 && (Math.abs(ball.vel.x) > 0.5 || Math.abs(ball.vel.y) > 0.5)) {
+             createParticles(ball.pos.x, ball.pos.y, 1, '#fbbf24'); 
+          }
       }
       wasInSandRef.current = inSand;
       

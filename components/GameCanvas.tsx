@@ -14,10 +14,11 @@ interface GameCanvasProps {
   onGameStateChange: (state: GameState) => void;
   onStrokeTaken: () => void;
   onLevelComplete: (strokes: number) => void;
+  onPowerChange: (power: number) => void;
 }
 
 const GameCanvas: React.FC<GameCanvasProps> = ({ 
-  level, gameState, onGameStateChange, onStrokeTaken, onLevelComplete 
+  level, gameState, onGameStateChange, onStrokeTaken, onLevelComplete, onPowerChange
 }) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   
@@ -56,7 +57,8 @@ const GameCanvas: React.FC<GameCanvasProps> = ({
     dragStartRef.current = null;
     dragCurrentRef.current = null;
     wasInSandRef.current = false;
-  }, [level]);
+    onPowerChange(0);
+  }, [level, onPowerChange]);
 
   // Physics Logic Helpers
   const checkCollisionRect = (ball: Ball, rect: Wall) => {
@@ -375,12 +377,20 @@ const GameCanvas: React.FC<GameCanvasProps> = ({
     if (dx*dx + dy*dy < 2500) {
         dragStartRef.current = { x: ball.pos.x, y: ball.pos.y }; // Anchor drag start to ball center
         dragCurrentRef.current = { x, y }; // Current is where mouse is
+        onPowerChange(0);
     }
   };
 
   const handleMove = (x: number, y: number) => {
     if (!dragStartRef.current) return;
     dragCurrentRef.current = { x, y };
+    
+    // Calculate power for UI
+    const dx = dragStartRef.current.x - x;
+    const dy = dragStartRef.current.y - y;
+    const dist = Math.sqrt(dx*dx + dy*dy);
+    const power = Math.min(dist * POWER_MULTIPLIER, MAX_POWER);
+    onPowerChange((power / MAX_POWER) * 100);
   };
 
   const handleEnd = () => {
@@ -412,6 +422,7 @@ const GameCanvas: React.FC<GameCanvasProps> = ({
     
     dragStartRef.current = null;
     dragCurrentRef.current = null;
+    onPowerChange(0);
   };
 
   // Mouse/Touch Events
@@ -466,4 +477,4 @@ const GameCanvas: React.FC<GameCanvasProps> = ({
   );
 };
 
-export default GameCanvas;
+export default React.memo(GameCanvas);

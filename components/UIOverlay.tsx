@@ -9,10 +9,11 @@ interface UIOverlayProps {
   onNextLevel: () => void;
   onRestart: () => void;
   levelScore?: number;
+  currentPower: number;
 }
 
 export const UIOverlay: React.FC<UIOverlayProps> = ({
-  level, strokes, totalScore, gameState, onNextLevel, onRestart, levelScore
+  level, strokes, totalScore, gameState, onNextLevel, onRestart, currentPower
 }) => {
   return (
     <div className="absolute top-0 left-0 w-full h-full pointer-events-none flex flex-col justify-between p-4">
@@ -27,6 +28,23 @@ export const UIOverlay: React.FC<UIOverlayProps> = ({
            <div className="text-2xl font-mono font-bold">{strokes} <span className="text-sm font-sans font-normal text-slate-400">Strokes</span></div>
            <div className="text-sm text-slate-300">Total: {totalScore}</div>
         </div>
+      </div>
+
+      {/* Power Meter - Right Side */}
+      <div className="absolute right-4 top-1/2 -translate-y-1/2 flex items-center gap-2">
+         {currentPower > 0 && (
+            <div className="text-white font-bold font-mono text-lg drop-shadow-[0_2px_2px_rgba(0,0,0,0.8)]">
+                {Math.round(currentPower)}%
+            </div>
+         )}
+         <div className="h-64 w-6 bg-slate-900/90 rounded-full border border-slate-600 relative overflow-hidden shadow-2xl">
+            <div 
+              className="absolute bottom-0 left-0 w-full rounded-full overflow-hidden transition-all duration-75 ease-out"
+              style={{ height: `${currentPower}%` }}
+            >
+                <div className="absolute bottom-0 left-0 w-full h-64 bg-gradient-to-t from-green-500 via-yellow-400 to-red-600"></div>
+            </div>
+         </div>
       </div>
 
       {/* Center Messages */}

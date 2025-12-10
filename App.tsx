@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useCallback } from 'react';
 import GameCanvas from './components/GameCanvas';
 import { UIOverlay } from './components/UIOverlay';
 import { AICaddy } from './components/AICaddy';
@@ -10,25 +10,29 @@ const App = () => {
   const [gameState, setGameState] = useState<GameState>(GameState.AIMING);
   const [strokes, setStrokes] = useState(0);
   const [totalScore, setTotalScore] = useState(0);
+  const [currentPower, setCurrentPower] = useState(0);
 
   const currentLevel = LEVELS[currentLevelIndex];
 
-  const handleStrokeTaken = () => {
+  const handlePowerChange = useCallback((power: number) => {
+    setCurrentPower(power);
+  }, []);
+
+  const handleGameStateChange = useCallback((state: GameState) => {
+    setGameState(state);
+  }, []);
+
+  const handleStrokeTaken = useCallback(() => {
     setStrokes(prev => prev + 1);
-  };
+  }, []);
 
-  const handleLevelComplete = (finalStrokes: number) => {
+  const handleLevelComplete = useCallback((finalStrokes: number) => {
     setTotalScore(prev => prev + finalStrokes);
-    
-    // Slight delay is handled in Canvas before calling this, but we can verify here
-    if (currentLevelIndex < LEVELS.length - 1) {
-        // Wait for user to click "Next"
-    } else {
-        // End game
-    }
-  };
+  }, []);
 
-  const nextLevel = () => {
+  const nextLevel = useCallback(() => {
+    // Access state via closure or functional updates if needed, 
+    // but here we depend on currentLevelIndex so we add it to deps
     if (currentLevelIndex < LEVELS.length - 1) {
       setCurrentLevelIndex(prev => prev + 1);
       setStrokes(0);
@@ -36,14 +40,14 @@ const App = () => {
     } else {
       setGameState(GameState.GAME_OVER);
     }
-  };
+  }, [currentLevelIndex]);
 
-  const restartGame = () => {
+  const restartGame = useCallback(() => {
     setCurrentLevelIndex(0);
     setStrokes(0);
     setTotalScore(0);
     setGameState(GameState.AIMING);
-  };
+  }, []);
 
   return (
     <div className="min-h-screen bg-slate-900 flex flex-col items-center justify-center p-2 sm:p-4 font-sans select-none">
@@ -52,9 +56,10 @@ const App = () => {
         <GameCanvas 
           level={currentLevel}
           gameState={gameState}
-          onGameStateChange={setGameState}
+          onGameStateChange={handleGameStateChange}
           onStrokeTaken={handleStrokeTaken}
           onLevelComplete={handleLevelComplete}
+          onPowerChange={handlePowerChange}
         />
         
         <UIOverlay 
@@ -64,6 +69,7 @@ const App = () => {
           gameState={gameState}
           onNextLevel={nextLevel}
           onRestart={restartGame}
+          currentPower={currentPower}
         />
       </div>
 
